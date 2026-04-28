@@ -17,10 +17,23 @@ const hookClick = (e) => {
         console.log('not handle origin', origin)
     }
 }
+const { invoke } = window.__TAURI__.core
+const hookClick = (e) => {
+const origin = e.target.closest('a')
+const isBaseTargetBlank = document.querySelector(
+    'head base[target="_blank"]'
+)
+if (
+    (origin && origin.href && origin.target === '_blank') ||
+    (origin && origin.href && isBaseTargetBlank)
+) {
+    e.preventDefault()
+    invoke('open_url', { url: origin.href })
+}
+}
 
 window.open = function (url, target, features) {
-    console.log('open', url, target, features)
-    location.href = url
+invoke('open_url', { url: url })
 }
 
 document.addEventListener('click', hookClick, { capture: true })
